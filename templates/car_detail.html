@@ -1,0 +1,225 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<section class="container py-5">
+
+    <!-- MAIN SECTION -->
+    <div class="row g-5 align-items-start">
+
+        <!-- IMAGE GALLERY -->
+        <div class="col-lg-6 reveal">
+
+            <div id="carCarousel"
+                 class="carousel slide shadow-lg rounded overflow-hidden"
+                 data-bs-ride="carousel">
+
+                <div class="carousel-inner">
+
+                    <div class="carousel-item active">
+                        <img src="{{ url_for('static', filename='uploads/' + car.image) }}"
+                             class="d-block w-100">
+                    </div>
+
+                    <div class="carousel-item">
+                        <img src="{{ url_for('static', filename='uploads/' + car.image) }}"
+                             class="d-block w-100">
+                    </div>
+
+                </div>
+
+                <button class="carousel-control-prev"
+                        type="button"
+                        data-bs-target="#carCarousel"
+                        data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+
+                <button class="carousel-control-next"
+                        type="button"
+                        data-bs-target="#carCarousel"
+                        data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- DETAILS -->
+        <div class="col-lg-6 sticky-details reveal">
+
+            <h1 class="fw-bold mb-2">{{ car.model }}</h1>
+            <p class="text-muted mb-3">{{ car.brand.name }}</p>
+
+            <!-- AVERAGE RATING -->
+            <div class="mb-3">
+                <div class="stars animated-stars"
+                     data-rating="{{ avg_rating }}">
+                </div>
+                <small class="text-muted">
+                    {{ avg_rating }} / 5 ({{ review_count }} reviews)
+                </small>
+            </div>
+
+            <p class="mb-4">
+                {{ car.description }}
+            </p>
+
+            <!-- SPEC GRID -->
+            <div class="spec-grid mb-4">
+
+                <div>
+                    <span class="spec-label">Engine</span>
+                    <span class="spec-value">{{ car.engine }}</span>
+                </div>
+
+                <div>
+                    <span class="spec-label">Horsepower</span>
+                    <span class="spec-value">{{ car.horsepower }} HP</span>
+                </div>
+
+                <div>
+                    <span class="spec-label">Transmission</span>
+                    <span class="spec-value">{{ car.transmission }}</span>
+                </div>
+
+                <div>
+                    <span class="spec-label">Price</span>
+                    <span class="spec-value">{{ car.price }}</span>
+                </div>
+
+            </div>
+
+            <a href="/" class="btn btn-dark px-4">
+                Back to Collection
+            </a>
+
+        </div>
+    </div>
+
+    <!-- REVIEWS SECTION -->
+    <div class="mt-5 pt-4 border-top reveal">
+
+        <h4 class="mb-4">Customer Reviews</h4>
+
+        <!-- REVIEW FORM -->
+        <form method="POST"
+              action="/review/{{ car.id }}"
+              class="row g-3 mb-4">
+
+            <div class="col-md-2">
+                <select name="rating" class="form-select">
+                    <option value="5">★★★★★</option>
+                    <option value="4">★★★★☆</option>
+                    <option value="3">★★★☆☆</option>
+                    <option value="2">★★☆☆☆</option>
+                    <option value="1">★☆☆☆☆</option>
+                </select>
+            </div>
+
+            <div class="col-md-8">
+                <input type="text"
+                       name="comment"
+                       class="form-control"
+                       placeholder="Write your review...">
+            </div>
+
+            <div class="col-md-2">
+                <button class="btn btn-dark w-100">
+                    Submit
+                </button>
+            </div>
+
+        </form>
+
+        <!-- RATING BREAKDOWN -->
+        {% if review_count > 0 %}
+        <div class="mb-4">
+
+            <h6 class="mb-3">Rating Breakdown</h6>
+
+            {% for star in range(5, 0, -1) %}
+                {% set count = car.reviews | selectattr("rating", "equalto", star) | list | length %}
+                {% set percentage = (count / review_count * 100) if review_count > 0 else 0 %}
+
+                <div class="d-flex align-items-center mb-2">
+                    <span class="me-2">{{ star }}★</span>
+
+                    <div class="progress flex-grow-1 me-2"
+                         style="height: 8px;">
+                        <div class="progress-bar bg-warning"
+                             style="width: {{ percentage }}%">
+                        </div>
+                    </div>
+
+                    <span>{{ count }}</span>
+                </div>
+            {% endfor %}
+
+        </div>
+        {% endif %}
+
+        <!-- REVIEW LIST -->
+        {% if car.reviews %}
+            {% for review in car.reviews %}
+                <div class="review-card p-3 mb-3 shadow-sm">
+
+                    <div class="stars mb-1">
+                        {% for i in range(review.rating) %}
+                            ★
+                        {% endfor %}
+                        {% for i in range(5 - review.rating) %}
+                            ☆
+                        {% endfor %}
+                    </div>
+
+                    <p class="mb-1">{{ review.comment }}</p>
+
+                    <small class="text-muted">
+                        {{ review.created_at.strftime('%d %b %Y') }}
+                    </small>
+
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted">No reviews yet.</p>
+        {% endif %}
+
+    </div>
+
+    <!-- RELATED MODELS -->
+    <div class="mt-5 pt-4 border-top reveal">
+
+        <h4 class="mb-4">Related Models</h4>
+
+        <div class="row">
+
+            {% for related in car.brand.cars %}
+                {% if related.id != car.id %}
+                <div class="col-md-4 mb-4">
+                    <div class="card premium-card border-0 shadow-sm h-100">
+
+                        <img src="{{ url_for('static', filename='uploads/' + related.image) }}"
+                             class="card-img-top">
+
+                        <div class="card-body">
+                            <h6>{{ related.model }}</h6>
+                            <p class="text-muted mb-1">{{ related.price }}</p>
+
+                            <a href="/car/{{ related.id }}"
+                               class="stretched-link text-decoration-none">
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

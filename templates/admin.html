@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h3>Add New Car</h3>
+
+<form method="POST" enctype="multipart/form-data" class="col-md-6">
+    <input name="model" class="form-control mb-2" placeholder="Model">
+    <textarea name="description" class="form-control mb-2" placeholder="Description"></textarea>
+    <input name="engine" class="form-control mb-2" placeholder="Engine">
+    <input name="horsepower" class="form-control mb-2" placeholder="Horsepower">
+    <input name="mileage" class="form-control mb-2" placeholder="Mileage">
+    <input name="transmission" class="form-control mb-2" placeholder="Transmission">
+    <input name="price" class="form-control mb-2" placeholder="Price">
+
+    <select name="brand_id" class="form-control mb-2">
+        {% for brand in brands %}
+        <option value="{{ brand.id }}">{{ brand.name }}</option>
+        {% endfor %}
+    </select>
+
+    <input type="file" name="image" class="form-control mb-3">
+    <button class="btn btn-success">Add Car</button>
+</form>
+
+{% endblock %}

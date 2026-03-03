@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2 class="mb-4">{{ brand.name }} Models</h2>
+
+<div class="row">
+    {% for car in brand.cars %}
+    <div class="col-md-4 mb-4">
+        <div class="card shadow h-100">
+            <img src="{{ url_for('static', filename='uploads/' + car.image) }}" class="card-img-top">
+            <div class="card-body d-flex flex-column">
+                <h5>{{ car.model }}</h5>
+                <p>{{ car.engine }}</p>
+                <a href="/car/{{ car.id }}" class="btn btn-dark mt-auto">
+                    View Details
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

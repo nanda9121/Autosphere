@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h3>Contact Us</h3>
+
+<form method="POST">
+    <input name="name" class="form-control mb-3" placeholder="Your Name" required>
+    <input name="email" type="email" class="form-control mb-3" placeholder="Your Email" required>
+    <textarea name="message" class="form-control mb-3" placeholder="Your Message" required></textarea>
+    <button class="btn btn-dark">Send Message</button>
+</form>
+
+{% endblock %}

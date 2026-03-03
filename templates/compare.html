@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>Compare Cars</h2>
+
+<form method="GET" class="row mb-4">
+    <div class="col-md-5">
+        <select name="car1" class="form-select">
+            {% for car in cars %}
+            <option value="{{ car.id }}">{{ car.model }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="col-md-5">
+        <select name="car2" class="form-select">
+            {% for car in cars %}
+            <option value="{{ car.id }}">{{ car.model }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <button class="btn btn-dark w-100">Compare</button>
+    </div>
+</form>
+
+{% if car1 and car2 %}
+<table class="table table-bordered">
+    <tr>
+        <th>Specification</th>
+        <th>{{ car1.model }}</th>
+        <th>{{ car2.model }}</th>
+    </tr>
+    <tr>
+        <td>Engine</td>
+        <td>{{ car1.engine }}</td>
+        <td>{{ car2.engine }}</td>
+    </tr>
+    <tr>
+        <td>Horsepower</td>
+        <td>{{ car1.horsepower }}</td>
+        <td>{{ car2.horsepower }}</td>
+    </tr>
+    <tr>
+        <td>Price</td>
+        <td>{{ car1.price }}</td>
+        <td>{{ car2.price }}</td>
+    </tr>
+</table>
+{% endif %}
+
+{% endblock %}
