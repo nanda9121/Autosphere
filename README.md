@@ -36,7 +36,7 @@ AutoSphere is a production-style full-stack web application built using Flask an
 ### 🧠 Backend Architecture
 - Flask-based modular routing
 - SQLAlchemy ORM relational schema
-- REST API endpoint (`/api/cars`)
+- REST API endpoint 
 - Secure password hashing
 
 ---
@@ -65,4 +65,22 @@ User → Favorites
 
 Designed using SQLAlchemy ORM with normalized structure.
 
-
+📂 Project Structure
+AutoSphere/
+│
+├── app.py
+├── models.py
+├── seed.py
+├── requirements.txt
+│
+├── static/
+│ ├── css/
+│ ├── js/
+│ └── uploads/
+│
+└── templates/
+  ├── layout.html
+  ├── index.html
+  ├── car_detail.html
+  ├── navbar.html
+  ├── footer.html
