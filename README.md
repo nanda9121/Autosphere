@@ -1,86 +1,62 @@
-# 🚗 AutoSphere – Full-Stack Automotive Discovery Platform
+# AutoSphere — Full-stack automotive discovery
 
-AutoSphere is a production-style full-stack web application built using Flask and SQLAlchemy that enables users to explore global luxury, performance, and electric vehicles with dynamic filtering, reviews, and modern UI features.
+AutoSphere is a premium car discovery experience rebuilt with a React client and a Node.js/Express API. It combines editorial-style browsing with useful catalog interactions: search, category filtering, sorting, favorites, vehicle detail views, and comparison selection.
 
----
+## What changed
 
-## 🌍 Live Demo
-(Add your deployed link here once deployed)
+- Replaced the old Bootstrap/Jinja presentation with a responsive React/Vite interface.
+- Added a Node.js + Express REST API backed by SQLite.
+- Added persistent favorites and seeded catalog data.
+- Added a responsive design system with keyboard-friendly controls, mobile navigation, detail modal, and compare workflow.
+- Kept the original Flask implementation in the repository as a historical reference while the new app runs through Node.
 
----
+## Stack
 
-## 📌 Features
+- React 18, React Router, Lucide React
+- Vite
+- Node.js, Express, CORS
+- JSON-backed persistence for favorites and catalog data
+- CSS with responsive layouts and design tokens
 
-### 🔎 Dynamic Search & Filtering
-- Search by brand or model
-- Filter vehicles by brand
-- Real-time database-driven results
+## Run locally
 
-### ⭐ Review & Rating System
-- Submit reviews with 1–5 star ratings
-- Automatic average rating calculation
-- Rating breakdown visualization
-- Star-based UI rendering
+Requirements: Node.js 20+
 
-### 🚘 Related Vehicle Recommendations
-- Displays similar cars from the same brand
-- Built using relational database mapping
+```powershell
+npm install
+npm run dev
+```
 
-### 🖼️ Premium UI Features
-- Image carousel gallery
-- Sticky specification panel
-- Smooth scroll reveal animations
-- Dark mode support
-- Responsive design (Mobile + Desktop)
+Open the frontend at `http://127.0.0.1:5173`.
 
-### 🧠 Backend Architecture
-- Flask-based modular routing
-- SQLAlchemy ORM relational schema
-- REST API endpoint 
-- Secure password hashing
+The API runs at `http://127.0.0.1:5001`.
 
----
---> 🏗️ Tech Stack
+## Production build
 
--->Backend
-- Python
-- Flask
-- SQLAlchemy
-- SQLite
+```powershell
+npm run build
+npm start
+```
 
--->Frontend
-- HTML5
-- Bootstrap 5
-- JavaScript
+The Express server serves the Vite build from `dist`.
 
----
+## API
 
-## 🗄️ Database Design
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/api/cars` | Search, filter, sort, and list cars |
+| GET | `/api/cars/:id` | Read one car |
+| POST | `/api/favorites/:id` | Toggle a saved car |
+| GET | `/api/meta` | Read catalog categories and totals |
 
-Relational schema with one-to-many relationships:
+## Project structure
 
-Brand → Cars  
-Car → Reviews  
-User → Favorites  
-
-Designed using SQLAlchemy ORM with normalized structure.
-
-📂 Project Structure
-AutoSphere/
-│
-├── app.py
-├── models.py
-├── seed.py
-├── requirements.txt
-│
-├── static/
-│ ├── css/
-│ ├── js/
-│ └── uploads/
-│
-└── templates/
-  ├── layout.html
-  ├── index.html
-  ├── car_detail.html
-  ├── navbar.html
-  ├── footer.html
+```text
+Autosphere/
+├── server/index.js       # Express API and SQLite setup
+├── src/main.jsx          # React application
+├── src/styles.css        # Responsive visual system
+├── vite.config.js
+├── package.json
+└── legacy Flask files     # Original implementation retained for reference
+```

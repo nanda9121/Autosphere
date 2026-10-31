@@ -1,0 +1,8 @@
+node_modules/
+dist/
+*.sqlite
+instance/*.sqlite
+instance/*.json
+.env
+__pycache__/
+*.py[cod]
