@@ -17,7 +17,7 @@ const cars = [
   ["Range Rover", "Sport Autobiography", "SUV", 2025, 157600, 626, "4.4L Twin-Turbo V8", "Automatic", "Petrol", "Uncompromising luxury and confident capability for every kind of escape.", "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=1200&q=85", "Land Rover Range Rover Sport Autobiography", "Autobiography"],
   ["Audi", "RS e-tron GT", "Electric", 2025, 166000, 637, "Dual Electric Motor", "2-Speed Automatic", "Electric", "Sculpted design and electrifying quattro performance with a serene grand-touring feel.", "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=1200&q=85"],
   ["Lamborghini", "Urus SE", "SUV", 2025, 251000, 789, "4.0L V8 Plug-in Hybrid", "8-Speed Automatic", "Hybrid", "The super-SUV evolves with electrified power and unmistakable Lamborghini attitude.", "https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?auto=format&fit=crop&w=1200&q=85"],
-  ["Aston Martin", "DB12", "Grand Tourer", 2025, 245000, 671, "4.0L V8 Twin-Turbo", "8-Speed Automatic", "Petrol", "A modern icon with handcrafted luxury, effortless speed, and a deeply composed ride.", "https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=1200&q=85"],
+  ["Aston Martin", "DB12", "Grand Tourer", 2025, 245000, 671, "4.0L V8 Twin-Turbo", "8-Speed Automatic", "Petrol", "A modern icon with handcrafted luxury, effortless speed, and a deeply composed ride.", "https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=1200&q=85", "Aston Martin DB12", "DB12", "Volante"],
   ["Tesla", "Model S Plaid", "Electric", 2024, 89990, 1020, "Tri-Motor Electric", "Single-Speed", "Electric", "Ridiculous acceleration, long-range touring, and an uncompromising technology-first cabin.", "https://images.unsplash.com/photo-1560958089-b8a1929cea89?auto=format&fit=crop&w=1200&q=85"],
   ["Bentley", "Bentayga Speed", "SUV", 2025, 219800, 626, "4.0L V8 Twin-Turbo", "8-Speed Automatic", "Petrol", "A serene, hand-finished sanctuary with the pace of a performance car.", "https://images.unsplash.com/photo-1562141961-b6f7a3d4d1f4?auto=format&fit=crop&w=1200&q=85"],
   ["McLaren", "Artura Spider", "Supercar", 2025, 281000, 690, "3.0L V6 Twin-Turbo Hybrid", "8-Speed DCT", "Hybrid", "A lightweight hybrid convertible engineered to make every corner feel like an event.", "https://images.unsplash.com/photo-1621135802920-133df287f89c?auto=format&fit=crop&w=1200&q=85"],
@@ -47,6 +47,7 @@ const detailsFor = (car) => {
     verdict: category === "SUV" ? "The compelling choice for going further without leaving luxury behind." : "A distinctive expression of performance, design, and everyday emotion.",
     gallerySearch: car[11] || `${brand} ${model}`,
     galleryIncludes: car[12] || model,
+    galleryExclude: car[13] || "",
   };
 };
 
@@ -74,6 +75,7 @@ store.cars = store.cars.map((car) => ({
   verdict: car.verdict || "A distinctive expression of performance, design, and everyday emotion.",
   gallerySearch: car.gallerySearch || (car.brand === "Range Rover" && car.model === "Sport Autobiography" ? "Land Rover Range Rover Sport Autobiography" : car.brand === "Maserati" && car.model === "GranTurismo Folgore" ? "Maserati GranTurismo Folgore" : `${car.brand} ${car.model}`),
   galleryIncludes: car.galleryIncludes || (car.brand === "Range Rover" && car.model === "Sport Autobiography" ? "Autobiography" : car.brand === "Maserati" && car.model === "GranTurismo Folgore" ? "Folgore" : car.model),
+  galleryExclude: car.galleryExclude || (car.brand === "Aston Martin" && car.model === "DB12" ? "Volante" : ""),
 }));
 if (!fs.existsSync(dataPath)) save();
 const galleryCache = new Map();
@@ -98,6 +100,7 @@ async function getGallery(car) {
     const payload = await response.json();
     const images = Object.values(payload.query?.pages || {})
       .filter((page) => page.title.toLowerCase().includes(car.galleryIncludes.toLowerCase()))
+      .filter((page) => !car.galleryExclude || !page.title.toLowerCase().includes(car.galleryExclude.toLowerCase()))
       .map((page) => page.imageinfo?.[0]?.thumburl || page.imageinfo?.[0]?.url)
       .filter(Boolean)
       .slice(0, 7);
