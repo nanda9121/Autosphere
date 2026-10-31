@@ -14,7 +14,7 @@ const cars = [
   ["Porsche", "911 Carrera GTS", "Performance", 2025, 171000, 532, "3.6L Flat-6 Hybrid", "PDK Automatic", "Hybrid", "The definitive sports car, tuned for the perfect balance of precision, pace, and usability.", "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=85"],
   ["BMW", "i7 M70", "Electric", 2025, 168500, 650, "Dual Electric Motor", "Automatic", "Electric", "Executive comfort meets silent, instant performance in BMW's flagship electric sedan.", "https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1200&q=85"],
   ["Ferrari", "296 GTB", "Supercar", 2024, 342000, 819, "3.0L V6 Twin-Turbo Hybrid", "7-Speed DCT", "Hybrid", "A compact, mid-engine hybrid that makes supercar performance feel beautifully intuitive.", "https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&w=1200&q=85"],
-  ["Range Rover", "Sport Autobiography", "SUV", 2025, 157600, 626, "4.4L Twin-Turbo V8", "Automatic", "Petrol", "Uncompromising luxury and confident capability for every kind of escape.", "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=1200&q=85"],
+  ["Range Rover", "Sport Autobiography", "SUV", 2025, 157600, 626, "4.4L Twin-Turbo V8", "Automatic", "Petrol", "Uncompromising luxury and confident capability for every kind of escape.", "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=1200&q=85", "Land Rover Range Rover Sport Autobiography", "Autobiography"],
   ["Audi", "RS e-tron GT", "Electric", 2025, 166000, 637, "Dual Electric Motor", "2-Speed Automatic", "Electric", "Sculpted design and electrifying quattro performance with a serene grand-touring feel.", "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=1200&q=85"],
   ["Lamborghini", "Urus SE", "SUV", 2025, 251000, 789, "4.0L V8 Plug-in Hybrid", "8-Speed Automatic", "Hybrid", "The super-SUV evolves with electrified power and unmistakable Lamborghini attitude.", "https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?auto=format&fit=crop&w=1200&q=85"],
   ["Aston Martin", "DB12", "Grand Tourer", 2025, 245000, 671, "4.0L V8 Twin-Turbo", "8-Speed Automatic", "Petrol", "A modern icon with handcrafted luxury, effortless speed, and a deeply composed ride.", "https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=1200&q=85"],
@@ -27,7 +27,7 @@ const cars = [
   ["BMW", "M4 Competition xDrive", "Performance", 2025, 101100, 523, "3.0L Twin-Turbo I6", "8-Speed Automatic", "Petrol", "A precise coupe with muscular design, all-weather traction, and a driver-first cockpit.", "https://images.unsplash.com/photo-1556189250-72ba954cfc2b?auto=format&fit=crop&w=1200&q=85"],
   ["Chevrolet", "Corvette Z06", "Supercar", 2025, 112700, 670, "5.5L Flat-Plane V8", "8-Speed DCT", "Petrol", "American performance engineering distilled into a naturally aspirated, mid-engine icon.", "https://images.unsplash.com/photo-1553440569-bcc63803a83d?auto=format&fit=crop&w=1200&q=85"],
   ["Lucid", "Air Sapphire", "Electric", 2025, 249900, 1234, "Tri-Motor Electric", "Single-Speed", "Electric", "An electric grand tourer with extraordinary power, long-range composure, and a calm cabin.", "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?auto=format&fit=crop&w=1200&q=85"],
-  ["Maserati", "GranTurismo Folgore", "Grand Tourer", 2025, 190000, 751, "Tri-Motor Electric", "Single-Speed", "Electric", "Italian grand touring character with a sculpted body and instant electric performance.", "https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=1200&q=85"],
+  ["Maserati", "GranTurismo Folgore", "Grand Tourer", 2025, 190000, 751, "Tri-Motor Electric", "Single-Speed", "Electric", "Italian grand touring character with a sculpted body and instant electric performance.", "https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=1200&q=85", "Maserati GranTurismo Folgore", "Folgore"],
   ["Toyota", "GR Supra 3.0", "Performance", 2025, 56750, 382, "3.0L Turbo I6", "6-Speed Manual", "Petrol", "A compact sports car that rewards commitment with direct steering and an engaging manual option.", "https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&w=1200&q=85"],
   ["Rivian", "R1S Quad-Motor", "SUV", 2025, 94900, 835, "Quad Electric Motor", "Single-Speed", "Electric", "A family-sized adventure vehicle with serious off-road hardware and three rows of space.", "https://images.unsplash.com/photo-1609521263047-f8f205293f24?auto=format&fit=crop&w=1200&q=85"]
 ];
@@ -45,6 +45,8 @@ const detailsFor = (car) => {
     bodyStyle: category === "SUV" ? "Sport utility" : category === "Supercar" ? "Mid-engine coupe" : category === "Grand Tourer" ? "Grand touring coupe" : "Performance sedan",
     highlights: electric ? ["Instant electric torque", "Advanced driver assistance", "Quiet long-distance cabin"] : ["Hand-finished materials", "Driver-focused dynamics", "Signature powertrain character"],
     verdict: category === "SUV" ? "The compelling choice for going further without leaving luxury behind." : "A distinctive expression of performance, design, and everyday emotion.",
+    gallerySearch: car[11] || `${brand} ${model}`,
+    galleryIncludes: car[12] || model,
   };
 };
 
@@ -70,6 +72,8 @@ store.cars = store.cars.map((car) => ({
   bodyStyle: car.bodyStyle || (car.category === "SUV" ? "Sport utility" : "Performance sedan"),
   highlights: car.highlights || ["Hand-finished materials", "Driver-focused dynamics", "Signature powertrain character"],
   verdict: car.verdict || "A distinctive expression of performance, design, and everyday emotion.",
+  gallerySearch: car.gallerySearch || (car.brand === "Range Rover" && car.model === "Sport Autobiography" ? "Land Rover Range Rover Sport Autobiography" : car.brand === "Maserati" && car.model === "GranTurismo Folgore" ? "Maserati GranTurismo Folgore" : `${car.brand} ${car.model}`),
+  galleryIncludes: car.galleryIncludes || (car.brand === "Range Rover" && car.model === "Sport Autobiography" ? "Autobiography" : car.brand === "Maserati" && car.model === "GranTurismo Folgore" ? "Folgore" : car.model),
 }));
 if (!fs.existsSync(dataPath)) save();
 const galleryCache = new Map();
@@ -79,7 +83,7 @@ async function getGallery(car) {
   const params = new URLSearchParams({
     action: "query",
     generator: "search",
-    gsrsearch: `${car.brand} ${car.model}`,
+    gsrsearch: car.gallerySearch || `${car.brand} ${car.model}`,
     gsrnamespace: "6",
     gsrlimit: "7",
     prop: "imageinfo",
@@ -93,6 +97,7 @@ async function getGallery(car) {
     if (!response.ok) throw new Error(`Wikimedia returned ${response.status}`);
     const payload = await response.json();
     const images = Object.values(payload.query?.pages || {})
+      .filter((page) => page.title.toLowerCase().includes(car.galleryIncludes.toLowerCase()))
       .map((page) => page.imageinfo?.[0]?.thumburl || page.imageinfo?.[0]?.url)
       .filter(Boolean)
       .slice(0, 7);

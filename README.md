@@ -8,6 +8,7 @@ AutoSphere is a premium car discovery experience rebuilt with a React client and
 - Added a Node.js + Express REST API backed by SQLite.
 - Added persistent favorites and seeded catalog data.
 - Added model-specific Wikimedia Commons image galleries with seven-slide support, thumbnails, arrows, keyboard navigation, and a fallback image.
+- Added exact model-title filtering for Range Rover Sport Autobiography and Maserati GranTurismo Folgore so older or unrelated variants are excluded.
 - Added a responsive design system with keyboard-friendly controls, mobile navigation, detail modal, and compare workflow.
 - Kept the original Flask implementation in the repository as a historical reference while the new app runs through Node.
 
