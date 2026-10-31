@@ -22,20 +22,55 @@ const cars = [
   ["Bentley", "Bentayga Speed", "SUV", 2025, 219800, 626, "4.0L V8 Twin-Turbo", "8-Speed Automatic", "Petrol", "A serene, hand-finished sanctuary with the pace of a performance car.", "https://images.unsplash.com/photo-1562141961-b6f7a3d4d1f4?auto=format&fit=crop&w=1200&q=85"],
   ["McLaren", "Artura Spider", "Supercar", 2025, 281000, 690, "3.0L V6 Twin-Turbo Hybrid", "8-Speed DCT", "Hybrid", "A lightweight hybrid convertible engineered to make every corner feel like an event.", "https://images.unsplash.com/photo-1621135802920-133df287f89c?auto=format&fit=crop&w=1200&q=85"],
   ["Volvo", "EX90 Ultra", "Electric", 2025, 80990, 496, "Dual Electric Motor", "Single-Speed", "Electric", "A thoughtful electric flagship focused on Scandinavian calm, safety, and space.", "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?auto=format&fit=crop&w=1200&q=85"]
+  ,["Mercedes-Benz", "G 580 with EQ Technology", "Electric", 2025, 161500, 579, "Quad Electric Motor", "Single-Speed", "Electric", "The unmistakable G-Class silhouette meets near-silent torque and serious all-terrain confidence.", "https://images.unsplash.com/photo-1520031441872-265e4ff70366?auto=format&fit=crop&w=1200&q=85"],
+  ["Porsche", "Cayenne Turbo GT", "SUV", 2025, 196300, 650, "4.0L V8 Twin-Turbo", "8-Speed Tiptronic", "Petrol", "A road-focused SUV with sports-car responses, track-ready brakes, and room for the whole weekend.", "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=1200&q=85"],
+  ["BMW", "M4 Competition xDrive", "Performance", 2025, 101100, 523, "3.0L Twin-Turbo I6", "8-Speed Automatic", "Petrol", "A precise coupe with muscular design, all-weather traction, and a driver-first cockpit.", "https://images.unsplash.com/photo-1556189250-72ba954cfc2b?auto=format&fit=crop&w=1200&q=85"],
+  ["Chevrolet", "Corvette Z06", "Supercar", 2025, 112700, 670, "5.5L Flat-Plane V8", "8-Speed DCT", "Petrol", "American performance engineering distilled into a naturally aspirated, mid-engine icon.", "https://images.unsplash.com/photo-1553440569-bcc63803a83d?auto=format&fit=crop&w=1200&q=85"],
+  ["Lucid", "Air Sapphire", "Electric", 2025, 249900, 1234, "Tri-Motor Electric", "Single-Speed", "Electric", "An electric grand tourer with extraordinary power, long-range composure, and a calm cabin.", "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?auto=format&fit=crop&w=1200&q=85"],
+  ["Maserati", "GranTurismo Folgore", "Grand Tourer", 2025, 190000, 751, "Tri-Motor Electric", "Single-Speed", "Electric", "Italian grand touring character with a sculpted body and instant electric performance.", "https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=1200&q=85"],
+  ["Toyota", "GR Supra 3.0", "Performance", 2025, 56750, 382, "3.0L Turbo I6", "6-Speed Manual", "Petrol", "A compact sports car that rewards commitment with direct steering and an engaging manual option.", "https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&w=1200&q=85"],
+  ["Rivian", "R1S Quad-Motor", "SUV", 2025, 94900, 835, "Quad Electric Motor", "Single-Speed", "Electric", "A family-sized adventure vehicle with serious off-road hardware and three rows of space.", "https://images.unsplash.com/photo-1609521263047-f8f205293f24?auto=format&fit=crop&w=1200&q=85"]
 ];
 
+const detailsFor = (car) => {
+  const [brand, model, category, year, price, horsepower, engine, transmission, fuel, description, image] = car;
+  const electric = fuel === "Electric";
+  const hybrid = fuel === "Hybrid";
+  return {
+    id: 0, brand, model, category, year, price, horsepower, engine, transmission, fuel, description, image,
+    rating: 4.7,
+    acceleration: horsepower > 700 ? "2.8 sec" : horsepower > 500 ? "3.5 sec" : "4.8 sec",
+    range: electric ? "320 mi" : hybrid ? "48 mi electric" : "—",
+    seating: category === "SUV" ? "5–7 seats" : "2–4 seats",
+    bodyStyle: category === "SUV" ? "Sport utility" : category === "Supercar" ? "Mid-engine coupe" : category === "Grand Tourer" ? "Grand touring coupe" : "Performance sedan",
+    highlights: electric ? ["Instant electric torque", "Advanced driver assistance", "Quiet long-distance cabin"] : ["Hand-finished materials", "Driver-focused dynamics", "Signature powertrain character"],
+    verdict: category === "SUV" ? "The compelling choice for going further without leaving luxury behind." : "A distinctive expression of performance, design, and everyday emotion.",
+  };
+};
+
 const defaultData = {
-  cars: cars.map((car, index) => ({
-    id: index + 1,
-    brand: car[0], model: car[1], category: car[2], year: car[3], price: car[4],
-    horsepower: car[5], engine: car[6], transmission: car[7], fuel: car[8],
-    description: car[9], image: car[10], rating: 4.7,
-  })),
+  cars: cars.map((car, index) => ({ ...detailsFor(car), id: index + 1 })),
   favorites: [],
 };
 let store = fs.existsSync(dataPath) ? JSON.parse(fs.readFileSync(dataPath, "utf8")) : defaultData;
 if (!store.cars?.length) store = defaultData;
 const save = () => fs.writeFileSync(dataPath, JSON.stringify(store, null, 2));
+const existingIds = new Set(store.cars.map((car) => car.id));
+const newCars = defaultData.cars.filter((car) => !existingIds.has(car.id));
+if (newCars.length) {
+  const nextId = Math.max(...store.cars.map((car) => car.id), 0);
+  newCars.forEach((car, index) => store.cars.push({ ...car, id: nextId + index + 1 }));
+  save();
+}
+store.cars = store.cars.map((car) => ({
+  ...car,
+  acceleration: car.acceleration || (car.horsepower > 700 ? "2.8 sec" : car.horsepower > 500 ? "3.5 sec" : "4.8 sec"),
+  range: car.range || (car.fuel === "Electric" ? "320 mi" : car.fuel === "Hybrid" ? "48 mi electric" : "—"),
+  seating: car.seating || (car.category === "SUV" ? "5–7 seats" : "2–4 seats"),
+  bodyStyle: car.bodyStyle || (car.category === "SUV" ? "Sport utility" : "Performance sedan"),
+  highlights: car.highlights || ["Hand-finished materials", "Driver-focused dynamics", "Signature powertrain character"],
+  verdict: car.verdict || "A distinctive expression of performance, design, and everyday emotion.",
+}));
 if (!fs.existsSync(dataPath)) save();
 
 const app = express();
