@@ -12,6 +12,7 @@ function App() {
   const [category, setCategory] = useState("All");
   const [sort, setSort] = useState("featured");
   const [selected, setSelected] = useState(null);
+  const [gallery, setGallery] = useState([]);
   const [compare, setCompare] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -32,6 +33,12 @@ function App() {
     if (selected?.id === id) setSelected({ ...selected, favorite });
   };
   const toggleCompare = (car) => setCompare((current) => current.some((item) => item.id === car.id) ? current.filter((item) => item.id !== car.id) : current.length < 3 ? [...current, car] : current);
+  const openDetails = async (car) => {
+    setSelected(car);
+    setGallery([]);
+    const response = await fetch(`/api/cars/${car.id}/gallery`);
+    if (response.ok) setGallery((await response.json()).images);
+  };
 
   return (
     <div className="app-shell">
@@ -55,7 +62,7 @@ function App() {
           <div className="section-heading"><div><p className="eyebrow">THE COLLECTION</p><h2>Choose your <em>feeling.</em></h2></div><p>From electric silence to a V8 soundtrack,<br />discover what speaks to you.</p></div>
           <div className="toolbar"><div className="category-tabs"><button className={category === "All" ? "active" : ""} onClick={() => setCategory("All")}>All vehicles</button>{meta.categories.map(({ category: name, count }) => <button key={name} className={category === name ? "active" : ""} onClick={() => setCategory(name)}>{name} <sup>{count}</sup></button>)}</div><div className="sort-control"><SlidersHorizontal size={16} /><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="featured">Featured</option><option value="price-low">Price: Low to high</option><option value="price-high">Price: High to low</option><option value="power">Most powerful</option></select><ChevronDown size={15} /></div></div>
           <div className="search-row"><div className="search-box"><Search size={19} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search a marque, model, or feeling..." /><kbd>⌘ K</kbd></div><span className="result-count">{cars.length} vehicles</span></div>
-          <div className="car-grid">{cars.map((car, index) => <CarCard key={car.id} car={car} index={index} onSelect={setSelected} onFavorite={toggleFavorite} onCompare={toggleCompare} compare={compare.some((item) => item.id === car.id)} />)}</div>
+          <div className="car-grid">{cars.map((car, index) => <CarCard key={car.id} car={car} index={index} onSelect={openDetails} onFavorite={toggleFavorite} onCompare={toggleCompare} compare={compare.some((item) => item.id === car.id)} />)}</div>
           {!cars.length && <div className="empty"><Search size={28} /><h3>No vehicles found</h3><p>Try a different search or browse the full collection.</p><button className="text-btn" onClick={() => { setQuery(""); setCategory("All"); }}>Reset filters</button></div>}
         </section>
 
@@ -63,7 +70,7 @@ function App() {
       </main>
 
       {compare.length > 0 && <div className="compare-bar"><span><Zap size={17} /> Comparing {compare.length} of 3</span><div>{compare.map((car) => <button key={car.id} onClick={() => toggleCompare(car)}>{car.model} <X size={13} /></button>)}</div><button className="primary-btn compact" onClick={() => setCompare([])}>Clear</button></div>}
-      {selected && <DetailModal car={selected} related={cars.filter((car) => car.id !== selected.id && (car.category === selected.category || car.brand === selected.brand)).slice(0, 3)} onClose={() => setSelected(null)} onFavorite={toggleFavorite} onSelect={setSelected} />}
+      {selected && <DetailModal car={selected} gallery={gallery} related={cars.filter((car) => car.id !== selected.id && (car.category === selected.category || car.brand === selected.brand)).slice(0, 3)} onClose={() => setSelected(null)} onFavorite={toggleFavorite} onSelect={openDetails} />}
       <footer id="footer"><div className="brand"><span className="brand-mark">A</span><span>Auto<span>Sphere</span></span></div><p>© 2025 AutoSphere. Drive what moves you.</p><div><a href="#collection">Collection</a><a href="#about">Our story</a></div></footer>
     </div>
   );
@@ -73,8 +80,20 @@ function CarCard({ car, index, onSelect, onFavorite, onCompare, compare }) {
   return <article className="car-card" style={{ "--delay": `${index * 70}ms` }}><div className="car-image" onClick={() => onSelect(car)}><img src={car.image} alt={`${car.brand} ${car.model}`} loading="lazy" /><div className="card-top"><span className="tag">{car.category}</span><button className={car.favorite ? "heart active" : "heart"} onClick={(event) => { event.stopPropagation(); onFavorite(car.id); }} aria-label="Save vehicle"><Heart size={18} fill={car.favorite ? "currentColor" : "none"} /></button></div><button className="view-btn">View details <ArrowUpRight size={15} /></button></div><div className="car-info"><div><p className="car-brand">{car.brand}</p><h3>{car.model}</h3></div><strong>{money.format(car.price)}</strong></div><div className="car-specs"><span>{car.horsepower} HP</span><span>{car.fuel}</span><span>{car.year}</span><button className={compare ? "compare active" : "compare"} onClick={() => onCompare(car)}>{compare ? "Added" : "+ Compare"}</button></div></article>;
 }
 
-function DetailModal({ car, related, onClose, onFavorite, onSelect }) {
-  return <div className="modal-backdrop" onClick={onClose}><section className="detail-modal" onClick={(event) => event.stopPropagation()}><button className="modal-close" onClick={onClose}><X /></button><div className="detail-hero"><img src={car.image} alt={`${car.brand} ${car.model}`} /><div className="detail-image-label"><span>{car.year} / {car.category}</span><strong>{car.rating} <span>★</span></strong></div></div><div className="detail-content"><p className="eyebrow">{car.brand} · {car.bodyStyle || car.category}</p><h2>{car.model}<br /><em>{car.verdict}</em></h2><p>{car.description}</p><div className="detail-grid"><div><span>Power</span><strong>{car.horsepower} HP</strong></div><div><span>0–60 mph</span><strong>{car.acceleration}</strong></div><div><span>Engine</span><strong>{car.engine}</strong></div><div><span>Range</span><strong>{car.range}</strong></div><div><span>Transmission</span><strong>{car.transmission}</strong></div><div><span>Seating</span><strong>{car.seating}</strong></div></div><div className="detail-highlights"><p className="eyebrow">WHY IT STANDS OUT</p><ul>{(car.highlights || []).map((highlight) => <li key={highlight}>{highlight}</li>)}</ul></div><div className="detail-actions"><button className="primary-btn">Enquire about this car <ArrowUpRight size={17} /></button><button className="secondary-btn" onClick={() => onFavorite(car.id)}><Heart size={17} fill={car.favorite ? "currentColor" : "none"} /> {car.favorite ? "Saved" : "Save vehicle"}</button></div></div>{related.length > 0 && <div className="related-section"><div className="related-heading"><p className="eyebrow">YOU MAY ALSO LIKE</p><span>Similar vehicles</span></div><div className="related-grid">{related.map((item) => <button className="related-card" key={item.id} onClick={() => onSelect(item)}><img src={item.image} alt={`${item.brand} ${item.model}`} /><span><small>{item.brand}</small><strong>{item.model}</strong></span><ArrowUpRight size={15} /></button>)}</div></div>}</section></div>;
+function DetailModal({ car, gallery, related, onClose, onFavorite, onSelect }) {
+  const [slide, setSlide] = useState(0);
+  const images = gallery.length ? gallery : [car.image];
+  const move = (offset) => setSlide((current) => (current + offset + images.length) % images.length);
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "ArrowLeft") move(-1);
+      if (event.key === "ArrowRight") move(1);
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [images.length]);
+  return <div className="modal-backdrop" onClick={onClose}><section className="detail-modal" onClick={(event) => event.stopPropagation()}><button className="modal-close" onClick={onClose}><X /></button><div className="detail-hero"><img src={images[slide]} alt={`${car.brand} ${car.model} view ${slide + 1}`} /><button className="gallery-arrow previous" onClick={() => move(-1)} aria-label="Previous image">‹</button><button className="gallery-arrow next" onClick={() => move(1)} aria-label="Next image">›</button><div className="detail-image-label"><span>{slide + 1} / {images.length} · {car.year} / {car.category}</span><strong>{car.rating} <span>★</span></strong></div></div><div className="gallery-thumbs">{images.map((image, index) => <button key={`${image}-${index}`} className={index === slide ? "selected" : ""} onClick={() => setSlide(index)}><img src={image} alt={`Thumbnail ${index + 1}`} /></button>)}</div><p className="image-credit">Images sourced from Wikimedia Commons</p><div className="detail-content"><p className="eyebrow">{car.brand} · {car.bodyStyle || car.category}</p><h2>{car.model}<br /><em>{car.verdict}</em></h2><p>{car.description}</p><div className="detail-grid"><div><span>Power</span><strong>{car.horsepower} HP</strong></div><div><span>0–60 mph</span><strong>{car.acceleration}</strong></div><div><span>Engine</span><strong>{car.engine}</strong></div><div><span>Range</span><strong>{car.range}</strong></div><div><span>Transmission</span><strong>{car.transmission}</strong></div><div><span>Seating</span><strong>{car.seating}</strong></div></div><div className="detail-highlights"><p className="eyebrow">WHY IT STANDS OUT</p><ul>{(car.highlights || []).map((highlight) => <li key={highlight}>{highlight}</li>)}</ul></div><div className="detail-actions"><button className="primary-btn">Enquire about this car <ArrowUpRight size={17} /></button><button className="secondary-btn" onClick={() => onFavorite(car.id)}><Heart size={17} fill={car.favorite ? "currentColor" : "none"} /> {car.favorite ? "Saved" : "Save vehicle"}</button></div></div>{related.length > 0 && <div className="related-section"><div className="related-heading"><p className="eyebrow">YOU MAY ALSO LIKE</p><span>Similar vehicles</span></div><div className="related-grid">{related.map((item) => <button className="related-card" key={item.id} onClick={() => onSelect(item)}><img src={item.image} alt={`${item.brand} ${item.model}`} /><span><small>{item.brand}</small><strong>{item.model}</strong></span><ArrowUpRight size={15} /></button>)}</div></div>}</section></div>;
 }
 
 createRoot(document.getElementById("root")).render(<App />);

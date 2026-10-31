@@ -7,6 +7,7 @@ AutoSphere is a premium car discovery experience rebuilt with a React client and
 - Replaced the old Bootstrap/Jinja presentation with a responsive React/Vite interface.
 - Added a Node.js + Express REST API backed by SQLite.
 - Added persistent favorites and seeded catalog data.
+- Added model-specific Wikimedia Commons image galleries with seven-slide support, thumbnails, arrows, keyboard navigation, and a fallback image.
 - Added a responsive design system with keyboard-friendly controls, mobile navigation, detail modal, and compare workflow.
 - Kept the original Flask implementation in the repository as a historical reference while the new app runs through Node.
 
@@ -16,6 +17,7 @@ AutoSphere is a premium car discovery experience rebuilt with a React client and
 - Vite
 - Node.js, Express, CORS
 - JSON-backed persistence for favorites and catalog data
+- Wikimedia Commons image search for model-specific gallery imagery
 - CSS with responsive layouts and design tokens
 
 ## Run locally

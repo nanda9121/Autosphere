@@ -72,12 +72,45 @@ store.cars = store.cars.map((car) => ({
   verdict: car.verdict || "A distinctive expression of performance, design, and everyday emotion.",
 }));
 if (!fs.existsSync(dataPath)) save();
+const galleryCache = new Map();
+
+async function getGallery(car) {
+  if (galleryCache.has(car.id)) return galleryCache.get(car.id);
+  const params = new URLSearchParams({
+    action: "query",
+    generator: "search",
+    gsrsearch: `${car.brand} ${car.model}`,
+    gsrnamespace: "6",
+    gsrlimit: "7",
+    prop: "imageinfo",
+    iiprop: "url",
+    iiurlwidth: "1400",
+    format: "json",
+    origin: "*",
+  });
+  try {
+    const response = await fetch(`https://commons.wikimedia.org/w/api.php?${params}`);
+    if (!response.ok) throw new Error(`Wikimedia returned ${response.status}`);
+    const payload = await response.json();
+    const images = Object.values(payload.query?.pages || {})
+      .map((page) => page.imageinfo?.[0]?.thumburl || page.imageinfo?.[0]?.url)
+      .filter(Boolean)
+      .slice(0, 7);
+    const gallery = [...new Set([...images, car.image])].slice(0, 7);
+    while (gallery.length < 5) gallery.push(car.image);
+    galleryCache.set(car.id, gallery);
+    return gallery;
+  } catch (error) {
+    console.error(`Unable to load gallery for ${car.brand} ${car.model}:`, error.message);
+    return Array.from({ length: 5 }, () => car.image);
+  }
+}
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get("/api/cars", (req, res) => {
+app.get("/api/cars", async (req, res) => {
   const { q = "", category = "All", sort = "featured" } = req.query;
   const clauses = [];
   const values = [];
@@ -91,13 +124,23 @@ app.get("/api/cars", (req, res) => {
   let rows = store.cars.filter((car) => (!search || [car.brand, car.model, car.description].some((value) => value.toLowerCase().includes(search))) && (category === "All" || car.category === category));
   rows = rows.sort((a, b) => order === "price ASC" ? a.price - b.price : order === "price DESC" ? b.price - a.price : order === "horsepower DESC" ? b.horsepower - a.horsepower : b.rating - a.rating);
   const favoriteIds = new Set(store.favorites);
-  res.json(rows.map((car) => ({ ...car, favorite: favoriteIds.has(car.id) })));
+  const enriched = await Promise.all(rows.map(async (car) => {
+    const gallery = await getGallery(car);
+    return { ...car, image: gallery[0], favorite: favoriteIds.has(car.id) };
+  }));
+  res.json(enriched);
 });
 
 app.get("/api/cars/:id", (req, res) => {
   const car = store.cars.find((item) => item.id === Number(req.params.id));
   if (!car) return res.status(404).json({ error: "Vehicle not found" });
   res.json({ ...car, favorite: store.favorites.includes(car.id) });
+});
+
+app.get("/api/cars/:id/gallery", async (req, res) => {
+  const car = store.cars.find((item) => item.id === Number(req.params.id));
+  if (!car) return res.status(404).json({ error: "Vehicle not found" });
+  res.json({ carId: car.id, images: await getGallery(car) });
 });
 
 app.post("/api/favorites/:id", (req, res) => {
